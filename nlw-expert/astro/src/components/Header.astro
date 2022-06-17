@@ -1,0 +1,29 @@
+---
+    import { Image } from "astro:assets";
+
+    import imagePath from "../assets/nlw-expert-logo.svg";
+
+    const { title } = Astro.props;
+---
+
+<header>
+    <Image src={imagePath} alt="Logo NLW" />
+
+    <h1>Teste seus conhecimentos em {title}</h1>
+</header>
+
+<style>
+    header {
+        margin-top: 4rem;
+        padding-bottom: 1.5rem;
+
+        border-bottom: 1px solid #334155;
+	}
+
+	header h1 {
+        margin-top: 1.5rem;
+
+        font-size: 2rem;
+        color: #f1f5f9;
+	}
+</style>

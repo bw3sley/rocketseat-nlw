@@ -1,0 +1,198 @@
+---
+	import type { GetStaticPaths } from "astro";
+	
+	import Layout from "../layouts/Layout.astro";
+
+	import Header from "../components/Header.astro";
+
+	const { page } = Astro.props;
+
+	const [question] = page.data;
+
+	export const getStaticPaths = (({ paginate }) => {
+		const questions = [
+			{
+				question: "Qual é o uso do operador '===' em JavaScript?",
+				answers: [
+					"Atribuição de valor",
+					"Comparação de valor e tipo",
+					"Adição de valores"
+				],
+				right: 1
+			},
+			{
+				question: "Qual método é usado para analisar uma string para um inteiro em JavaScript?",
+				answers: [
+					"parseInt()",
+					"parseString()",
+					"toInt()"
+				],
+				right: 0
+			},
+			{
+				question: "Qual palavra-chave é usada para definir uma variável em JavaScript?",
+				answers: [
+					"var",
+					"let",
+					"Ambas 'var' e 'let'"
+				],
+				right: 2
+			},
+			{
+				question: "Qual objeto é a base de todos os objetos em JavaScript?",
+				answers: [
+					"Object",
+					"Array",
+					"String"
+				],
+				right: 0
+			},
+			{
+				question: "Qual função é usada para escrever algo no console do navegador?",
+				answers: [
+					"document.write()",
+					"console.write()",
+					"console.log()"
+				],
+				right: 2
+			},
+			{
+				question: "Como você declara uma função em JavaScript?",
+				answers: [
+					"function:myFunction()",
+					"function myFunction()",
+					"var myFunction = function()"
+				],
+				right: 1
+			},
+			{
+				question: "Qual método remove o último elemento de um array em JavaScript?",
+				answers: [
+					"pop()",
+					"push()",
+					"last()"
+				],
+				right: 0
+			},
+			{
+				question: "Qual operador é usado para verificar se dois valores são iguais em valor em JavaScript?",
+				answers: [
+					"==",
+					"===",
+					"="
+				],
+				right: 0
+			},
+			{
+				question: "Como você pode adicionar um comentário em uma linha em JavaScript?",
+				answers: [
+					"// Comentário",
+					"/* Comentário */",
+					"<!-- Comentário -->"
+				],
+				right: 0
+			},
+			{
+				question: "Qual estrutura de repetição é usada para executar um bloco de código um número específico de vezes?",
+				answers: [
+					"for",
+					"while",
+					"do-while"
+				],
+				right: 0
+			},
+		];
+
+		return paginate(questions, {
+			pageSize: 1
+		});
+	}) satisfies GetStaticPaths;
+---
+
+<Layout>
+	<main>
+		<Header title="programação" />
+	
+		<div id="quiz">
+			<div class="quiz-item">
+				<h3 data-id={page.currentPage}>{question.question}</h3>
+			
+				<dl>
+					{question.answers.map((answer, index) => (
+						<dt>
+							<input id={`item-${index}`} type="radio" name="item" value={index} />
+							<label for={`item-${index}`}>{answer}</label>
+						</dt>
+					))}
+				</dl>
+			</div>
+		</div>
+
+		<div class="flex justify-between">
+			{
+				page.url.prev && (
+					<a 
+						href={page.url.prev} 
+						class="py-2 px-3 bg-slate-700 text-white rounded text-xs transition-colors hover:bg-slate-800 hover:outline hover:outline-1 hover:outline-slate-100"
+					>
+						Anterior
+					</a>
+				)
+			}
+			
+			{
+				page.url.next && (
+					<a 
+						href={page.url.next} 
+						class="py-2 px-3 bg-slate-700 text-white rounded text-xs transition-colors hover:bg-slate-800 hover:outline hover:outline-1 hover:outline-slate-100 ml-auto"
+					>
+						Próxima
+					</a>
+				)
+			}
+		</div>
+	
+		<div id="right-answers">
+		  <strong>Acertos</strong>
+		  <span>0 de 10</span>
+		</div>
+	</main>
+</Layout>
+
+<script define:vars={{ page, question }}>
+	const values = JSON.parse(localStorage.getItem("@nlw-expert-astro") || "{}");
+
+	const inputs = document.querySelectorAll("input");
+
+	const count = () => Object.keys(values).filter(key => values[key].isCorrect).length;
+
+	const total = document.querySelector("#right-answers span");
+	total.textContent = `${count()} de 10`;
+
+	let selected;
+
+	for (const key of Object.keys(values)) {
+		const current = values[page.currentPage];
+
+		selected = current?.selected;
+	}
+
+	for (const input of inputs) {
+		if (Number(input.value) === Number(selected)) {
+			input.checked = true;
+		}
+
+		input.addEventListener("change", (event) => {
+			const { value } = event.target;
+
+			values[page.currentPage] = {
+				selected: value,
+				isCorrect: Number(value) === Number(question.right)
+			}
+
+			localStorage.setItem("@nlw-expert-astro", JSON.stringify(values));
+
+			total.textContent = `${count()} de 10`;
+		})
+	}
+</script>
